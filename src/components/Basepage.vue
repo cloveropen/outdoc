@@ -4,52 +4,66 @@
       v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       app>
-      <v-list dense>
-        <template v-for="item in items">
-          <v-layout v-if="item.heading" :key="item.heading" align-center>
-            <v-flex xs6>
-              <v-subheader v-if="item.heading">{{ item.heading }}</v-subheader>
-            </v-flex>
-            <v-flex xs6 class="text-center">
-              <a href="#!" class="body-2 black--text">EDIT</a>
-            </v-flex>
-          </v-layout>
-          <v-list-group
-            v-else-if="item.children"
-            :key="item.text"
-            v-model="item.model"
-            :prepend-icon="item.model ? item.icon : item['icon-alt']"
-            append-icon
-          >
-            <template v-slot:activator>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>{{ item.text }}</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-            <v-list-item
-              v-for="(child, i) in item.children"
-              :key="i" 
-              @click="clickMenu(child.id)">
-              <v-list-item-action v-if="child.icon">
-                <v-icon>{{ child.icon }}</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>{{ child.text }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-group>
-          <v-list-item v-else :key="item.text" @click="clickMenu(item.id)">
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ item.text }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list>
+     <v-card>
+    <v-card-title>
+      候诊患者
+      <div class="flex-grow-1"></div>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="查询(门诊号/姓名)"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+    <v-data-table :items-per-page="5" single-select
+      :headers="headers"
+      :items="desserts"
+      :search="search"
+    > 
+      <template v-slot:item.name="{ item }">
+      <v-icon
+        small
+        class="mr-2"
+        @click="pidChanged(item)"
+      >
+       {{item.name}}
+      </v-icon>     
+      </template>
+      
+    </v-data-table>
+  </v-card>
+  <v-card>
+  <v-card-title>
+      就诊患者
+      <div class="flex-grow-1"></div>     
+    </v-card-title>
+    <v-data-table  dense
+    hide-default-footer
+      :headers="headers"
+      :items="desserts"
+      :search="search"
+      
+    ></v-data-table>
+  </v-card>
+  <v-card>
+  <v-card-title>
+      已诊患者
+      <div class="flex-grow-1"></div>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="查询(门诊号/姓名)"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+    <v-data-table dense 
+      :headers="headers"
+      :items="desserts"
+      :search="search"
+    ></v-data-table>
+  </v-card>
     </v-navigation-drawer>
 
     <v-app-bar
@@ -100,7 +114,10 @@
       </template>
       <span>退出登录</span>
     </v-tooltip>
+
+    
   </div>
+  
 </template>
 
 <script>
@@ -111,37 +128,39 @@ export default {
   data: () => ({
     dialog: false,
     drawer: null,
-    items: [
-      { icon: "contacts", text: "门诊挂号", id: "out_reg" },
-      { icon: "history", text: "划价收款", id: "out_cash" },
-      { icon: "content_copy", text: "交班结算", id: "out_chk" },
-      { icon: "keyboard", text: "发票号管理", id: "out_receipt" },
-      {
-        icon: "keyboard_arrow_up",
-        "icon-alt": "keyboard_arrow_down",
-        text: "查询与统计",
-        model: true,
-        children: [
-          { text: "挂号明细", id: "detail_reg" },
-          { text: "收款明细", id: "detail_cash" },
-          { text: "交班明细", id: "detail_chk" },
-          { text: "退号退款明细", id: "detail_undo" },
-          { text: "操作日志", id: "detail_op" }
+    search: '',
+        headers: [
+          {
+            text: '姓名',
+            align: 'left',
+            sortable: true,
+            value: 'name',
+            width: 100
+          },
+          { text: '挂号单', value: 'calories', width: 120 },
+          { text: '门诊号', value: 'fat', width: 120 },
+          { text: '类型', value: 'carbs', width: 80 }         
+        ],
+        desserts: [
+          {
+            name: '猪八戒',
+            calories: 159,
+            fat: 123456,
+            carbs: '候诊'
+          },
+          {
+            name: '唐三藏',
+            calories: 237,
+            fat: 123457,
+            carbs: '转诊'
+          },
+          {
+            name: '沙和尚',
+            calories: 262,
+            fat: 123458,
+            carbs: '预约'
+          }
         ]
-      },
-      {
-        icon: "settings",
-        "icon-alt": "keyboard_arrow_down",
-        text: "管理与维护",
-        model: false,
-        children: [
-          { text: "收费词典查询", id: "mg_dict" },
-          { text: "数据分析", id: "mg_analyse" },
-          { text: "发票管理", id: "mg_invoice" }
-        ]
-      },
-      { icon: "help", text: "退出登录", id: "logout" }
-    ]
   }),
   methods: {
     clickMenu(tstr) {
@@ -205,7 +224,14 @@ export default {
           this.$router.push({ path: "/login" });
       }
     },
-
+     pidChanged(e) {
+      //console.log("e=" + e.target.innerText);
+      window.alert("e="+JSON.stringify(e))
+    },
+    pidChanged1(e) {
+      //console.log("e=" + e.target.innerText);
+      window.alert("e1="+JSON.stringify(e))
+    },
     selectSource() {
       window.location.href = "http://www.cloveropen.com";
     }
